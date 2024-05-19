@@ -7,10 +7,16 @@ const rl = readline.createInterface({
   output: process.stdout
 });
 
-function askQuestion(question: string): Promise<void> {
-  return new Promise<void>((resolve) => {
-    rl.question(question, () => {
-      resolve();
+function askQuestion(card: Card): Promise<boolean> {
+  return new Promise<boolean>((resolve) => {
+    rl.question(`Question ${card.question}\nYour Answer: `, (userAnswer) => {
+      if (userAnswer.trim().toLowerCase() === card.answer.toLowerCase()) {
+      console.log('Correct');
+      resolve(true);
+      } else {
+        console.log('Incorrect');
+        resolve(false);
+      }
     });
   });
 }
@@ -20,8 +26,12 @@ async function playGame() {
   const cards: Card[] = generator.cards;
 
   for (const card of cards) {
-    await askQuestion(`Question: ${card.question}\nPress Enter to reveal the answer.\n`);
-    console.log(`Answer: ${card.answer}\n`);
+    const isCorrect = await askQuestion(card);
+    if (isCorrect) {
+      console.log('Congratulations');
+    } else {
+      console.log('Please try again');
+    }
   }
 
   rl.close();
